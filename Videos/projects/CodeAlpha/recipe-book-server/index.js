@@ -45,8 +45,18 @@ async function run() {
     const hourFoodDateBase = client.db("RecipeDB");
     const hourlyFoodCollection = hourFoodDateBase.collection("hourWiseFood");
 
-    const typeOfFoodDatabase = client.db("RecipeDB")
-    const typeOfFoodCollection = typeOfFoodDatabase.collection("typeOfFoods")
+    const typeOfFoodDatabase = client.db("RecipeDB");
+    const typeOfFoodCollection = typeOfFoodDatabase.collection("typeOfFoods");
+
+    const foodAppsDatabase = client.db("RecipeDB");
+    const foodAppsCollection = foodAppsDatabase.collection("foodApps");
+
+    const appFoodsDatabase = client.db("RecipeDB");
+    const appFoodsCollection = appFoodsDatabase.collection("appFoods");
+
+    const appsFoodOrderDatabase = client.db("RecipeDB");
+    const appsFoodOrderCollection =
+      appsFoodOrderDatabase.collection("appsFoodOrder");
 
     app.post("/addRecipe", async (req, res) => {
       const addRecipe = req.body;
@@ -114,14 +124,27 @@ async function run() {
     app.get("/countryFoodKid/:country", async (req, res) => {
       const country = req.params.country;
       const query = { country: country };
-
       const result = await countryFoodKidsCollection.find(query).toArray();
       res.send(result);
+    });
+
+    app.get("/details/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const detailsRecipe = await countryFoodKidsCollection.findOne(query);
+      res.send(detailsRecipe);
     });
 
     app.get("/hourWiseFood", async (req, res) => {
       const hourlyFood = hourlyFoodCollection.find();
       const result = await hourlyFood.toArray();
+      res.send(result);
+    });
+
+    app.get("/hourDetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await hourlyFoodCollection.find(query).toArray();
       res.send(result);
     });
 
@@ -138,18 +161,49 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/typeOfFood", async (req,res) => {
-      const typeOfFood = typeOfFoodCollection.find()
-      const result = await typeOfFood.toArray()
-      res.send(result)
-    })
+    app.get("/typeOfFood", async (req, res) => {
+      const typeOfFood = typeOfFoodCollection.find();
+      const result = await typeOfFood.toArray();
+      res.send(result);
+    });
 
-    app.get("/typeOfFood/:id", async (req,res) => {
-      const id = req.params.id
-      const query = {_id: new ObjectId(id)}
-      const result = await typeOfFoodCollection.find(query).toArray()
-      res.send(result)
-    })
+    app.get("/typeOfFood/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await typeOfFoodCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/foodApps", async (req, res) => {
+      const foodApps = foodAppsCollection.find();
+      const result = await foodApps.toArray();
+      res.send(result);
+    });
+
+    app.get("/appFoods", async (req, res) => {
+      const allOfFoods = appFoodsCollection.find();
+      const result = await allOfFoods.toArray();
+      res.send(result);
+    });
+
+    app.get("/SpecificAppFoods/:appName", async (req, res) => {
+      const appName = req.params.appName;
+      const query = { appName: appName };
+      const result = await appFoodsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.post("/appFoodsOrder", async (req, res) => {
+      const order = req.body;
+      const result = await appsFoodOrderCollection.insertOne(order);
+      res.send(result);
+    });
+
+    app.get("/appFoodsOrder", async (req, res) => {
+      const orderedFood = appsFoodOrderCollection.find();
+      const result = await orderedFood.toArray();
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
